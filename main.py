@@ -122,6 +122,56 @@ def originalDecision(startingHealth, currentHealth, shells, items, playerCuffed)
 
         if not ((shells[0] == "blank") and (target=="self")):
             currentTurn = playerCuffed
+        
+        shells.pop(0)
+
+def cheatingDecision(startingHealth, currentHealth, shells, items, playerCuffed): # AI if it was cheating
+    currentTurn = True
+    while (currentTurn) and (currentHealth > 0):
+        currentTurn = False
+        playerCuffed = False
+        knownShell = "none"
+        shotgunDamage = 1
+        target = "none"
+
+        knownShell = shells[0] # AI knows shell every time
+        
+        for i in range(len(items)):
+
+            if (items[i] == "magnifyingGlass"):
+                items[i] = "none"
+            if (items[i] == "cigarettes") and (currentHealth < startingHealth):
+                items[i] = "none"
+                currentHealth += 1
+            if (items[i] == "beer") and (knownShell == "blank"):
+                items[i] = "none"
+                knownShell = shells[0]
+            if ((items[i] == "handcuffs") and (knownShell == "live")):
+                items[i] = "none"
+                playerCuffed = True
+            if ((items[i] == "handsaw") and (knownShell == "live")):
+                items[i] = "none"
+                shotgunDamage = 2
+        
+        items = [item for item in items if item != "none"]
+
+        if knownShell == "blank": 
+            target = "self"
+            shotgunDamage = 0
+            
+        else: target = "player"
+
+        print("Shotgun Damage: " + str(shotgunDamage) + " to " + target)
+        print("Items: " + str(items))
+        print("Health: " + str(currentHealth))
+        print("Max Health: " + str(startingHealth))
+        print("------------")
+
+        if not ((shells[0] == "blank") and (target=="self")):
+            currentTurn = playerCuffed
+        
+        shells.pop(0)
+
 
 shellsTest = generateShells()
 itemsTest = generateItems(itemsTest)
@@ -130,4 +180,4 @@ startingHealth = generateHealth()[0]
 print(shellsTest)
 print(itemsTest)
 
-originalDecision(startingHealth, startingHealth, shellsTest, itemsTest, False)
+cheatingDecision(startingHealth, random.randint(1, startingHealth), shellsTest, itemsTest, False)
